@@ -1,0 +1,12 @@
+# Data
+*.csv
+*.json
+*.nc
+*.RData
+
+# Python
+__pycache__
+*.pyc
+
+# Editor settings
+.vscode
