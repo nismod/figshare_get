@@ -17,6 +17,7 @@ jobs:
           # This fetch element is only important if you are use SCM based
           # versioning (that looks at git tags to gather the version).
           # setuptools-scm needs tags to form a valid version number
+          fetch-depth: 0
           fetch-tags: true
 
       - name: Setup Python
