@@ -1,28 +1,39 @@
 [project]
 name = "figshare_get"
-version = "0.0.1"
-authors = [
-  { name="Tom Russell", email="tom.russell@ouce.ox.ac.uk" },
-]
+dynamic = ["version"]
+authors = [{ name = "Tom Russell", email = "tom.russell@ouce.ox.ac.uk" }]
 description = "Download from figshare"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
-dependencies=[
-    "requests",
-]
+dependencies = ["requests"]
+
+[project.optional-dependencies]
+dev = ["hatch"]
 
 [project.scripts]
-figshare_get="figshare_get.cli:figshare_get"
+figshare_get = "figshare_get.cli:figshare_get"
 
 [project.urls]
 "Homepage" = "https://github.com/nismod/figshare_get"
 "Bug Tracker" = "https://github.com/nismod/figshare_get/issues"
 
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs"]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/figshare_get/_version.py"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build]
+only-packages = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/figshare_get"]
