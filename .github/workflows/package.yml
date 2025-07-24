@@ -4,30 +4,63 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
-  build_sdist:
-    name: Build SDist
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - run: pipx run build --sdist
-      - run: pipx run twine check dist/*
-      - uses: actions/upload-artifact@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          path: dist/*.tar.gz
+          # This fetch element is only important if you are use SCM based
+          # versioning (that looks at git tags to gather the version).
+          # setuptools-scm needs tags to form a valid version number
+          fetch-tags: true
 
-  pypi-publish:
-    name: Upload release to PyPI
-    needs: [build_sdist]
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          # You can modify what version of Python you want to use for your release
+          python-version: "3.12"
+
+      - name: Install hatch
+        uses: pypa/hatch@a3c83ab3d481fbc2dc91dd0088628817488dd1d5
+
+      - name: Build package using Hatch
+        run: |
+          hatch build
+          echo ""
+          echo "Generated files:"
+          ls -lh dist/
+
+      # Store an artifact of the build to use in the publish step below
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+          if-no-files-found: error
+  publish:
+    name: Publish to PyPI
+    needs:
+      - build
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+    # Environment required here for trusted publisher
+    environment:
+      name: pypi
+      url: https://pypi.org/p/figshare-get
     permissions:
-      id-token: write
+      id-token: write # this permission is mandatory for PyPI publishing
     steps:
-      - uses: actions/download-artifact@v3
+      - name: Download dists
+        uses: actions/download-artifact@v4
         with:
-          name: artifact
-          path: dist
-
-      - name: Publish package distributions to PyPI
+          name: python-package-distributions
+          path: dist/
+          merge-multiple: true
+      - name: Publish package to PyPI
+        # Only publish to real PyPI on release
+        if: github.event_name == 'release' && github.event.action == 'published'
         uses: pypa/gh-action-pypi-publish@release/v1
