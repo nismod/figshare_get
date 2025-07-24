@@ -1,5 +1,8 @@
 # figshare_get
 
+![PyPI - Version](https://img.shields.io/pypi/v/figshare-get)
+
+
 Download a figshare article or collection using its DOI
 
 ## Installation
