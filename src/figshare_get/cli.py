@@ -19,38 +19,43 @@ import requests
 
 
 def figshare_get(args=None):
-    parser = argparse.ArgumentParser(prog="figshare_get")
-    parser.add_argument(
-        "doi",
-        type=str,
-        help="Search using the DOI of a figshare collection or article to download",
-    )
-    args = parser.parse_args(args)
+    try:
+        parser = argparse.ArgumentParser(prog="figshare_get")
+        parser.add_argument(
+            "doi",
+            type=str,
+            help="Search using the DOI of a figshare collection or article to download",
+        )
+        args = parser.parse_args(args)
 
-    # search articles
-    articles = search_articles(args.doi)
-    result = check_results(articles)
+        # search articles
+        articles = search_articles(args.doi)
+        result = check_results(articles)
 
-    # if found, download then quit
-    if result is not None:
+        # if found, download then quit
+        if result is not None:
+            id_ = result["id"]
+            print("Downloading from", result["doi"], result["title"])
+            download_article_meta(id_)
+            download_article_files(id_)
+            sys.exit()
+
+        # else search collections
+        collections = search_collections(args.doi)
+        result = check_results(collections)
+
+        if result is None:
+            print("Not found")
+            sys.exit()
+
         id_ = result["id"]
         print("Downloading from", result["doi"], result["title"])
-        download_article_meta(id_)
-        download_article_files(id_)
-        sys.exit()
-
-    # else search collections
-    collections = search_collections(args.doi)
-    result = check_results(collections)
-
-    if result is None:
-        print("Not found")
-        sys.exit()
-
-    id_ = result["id"]
-    print("Downloading from", result["doi"], result["title"])
-    download_collection_meta(id_)
-    download_collection_files(id_)
+        download_collection_meta(id_)
+        download_collection_files(id_)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        pass
 
 
 def check_results(results):
