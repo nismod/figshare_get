@@ -2,9 +2,10 @@
 
 See https://docs.figshare.com/ for API documentation.
 
-This script makes three API calls: search for a collection, to get the ID;
-request metadata about all articles in the collection; request metadata about
-all files in each article.
+This script makes a series of API calls:
+- search for an article or collection by DOI, to get the ID;
+- request metadata about the article, or all articles in the collection;
+- request metadata about all files in each article.
 
 Then it uses the "download_url" and "name" of each file to download and save to
 the working directory.
